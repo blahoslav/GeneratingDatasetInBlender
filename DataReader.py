@@ -7,6 +7,9 @@ Created on Mon Jul 15 10:44:32 2019
 """
 from PIL import Image
 import glob
+import numpy
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 class DataReader:
     __ImageList = []
     __Images = []
@@ -15,15 +18,23 @@ class DataReader:
     __PointYCoordinates = []
     __PointZCoordinates = []
     __OriginCoordinates = []
-    def __init__(self, imageFolderAddress, metadataFileAddress):
-        self.ImageFolderAddress = imageFolderAddress
+    def __init__(self, cadFolderAddress, imgFolderAddress, metadataFileAddress):
+        self.cadFolderAddress = cadFolderAddress
+        self.imgFolderAddress = imgFolderAddress
         self.MetadataFileAddress = metadataFileAddress
  
     def ReadImages(self):
-        for imageName in glob.glob(self.ImageFolderAddress + '/*.png'):
-            self.__ImageList.append(imageName.replace(self.ImageFolderAddress + '/', ''))
-            self.__Images.append(Image.open(imageName))
-        return self.__ImageList
+        self.__cadImageList = []
+        self.__cadImages = []
+        self.__imgImageList = []
+        self.__imgImages = []
+        for imageName in glob.glob(self.cadFolderAddress + '/*.png'):
+            self.__cadImageList.append(imageName.replace(self.cadFolderAddress + '/', ''))
+            self.__cadImages.append(Image.open(imageName))
+        for imageName in glob.glob(self.imgFolderAddress + '/*.png'):
+            self.__imgImageList.append(imageName.replace(self.imgFolderAddress + '/', ''))
+            self.__imgImages.append(Image.open(imageName))
+        return self.__cadImageList, self.__cadImages, self.__imgImageList, self.__imgImages 
     
     def ReadMetadata(self):
         metadataFile = open(self.MetadataFileAddress + "/metadata", "r")
@@ -36,22 +47,33 @@ class DataReader:
             line = line.replace("\n", "")
             if("name" in line):
                 self.__MetadataNames.append(line.replace("name = ", ""))
-            if("x" in line):
+            elif("x" in line):
                 self.__PointXCoordinates.append(line.replace("x = ", ""))
-            if("y" in line):
+            elif("y" in line):
                 self.__PointYCoordinates.append(line.replace("y = ", ""))
-            if("z" in line):
+            elif("z" in line):
                 self.__PointZCoordinates.append(line.replace("z = ", ""))
-            if("o" in line):
+            elif("o" in line):
                 self.__OriginCoordinates.append(line.replace("o = ", ""))
+        metadataFile.close()
         return self.__MetadataNames, self.__OriginCoordinates, self.__PointXCoordinates, self.__PointYCoordinates, self.__PointZCoordinates
     
-reader = DataReader("/home/blahoslav/Documents/BlenderDatasetPreparation", "/home/blahoslav/Documents/BlenderDatasetPreparation")
-imageNameList = reader.ReadImages()
-nameList, originCoordinates, pointXCoordinates, pointYCoordinates, pointZCoordinates = reader.ReadMetadata()
-
-
+    def ConvertVectorListToArray(self, vectorArray):
+        arrayOfVectors = []
+        for vector in vectorArray:
+            vector = vector.replace("<Vector (", "")
+            vector = vector.replace(")>","")
+            vector = vector.split(",")
+            vector = list(map(float, vector))
+            vector = numpy.asarray(vector)
+            arrayOfVectors.append(vector)
+        return arrayOfVectors
         
-
-
-        
+reader = DataReader("/home/blahoslav/Documents/BlenderDatasetPreparation/cad", "/home/blahoslav/Documents/BlenderDatasetPreparation/img", "/home/blahoslav/Documents/BlenderDatasetPreparation")
+cadImageNames, cadImages, imgImageNames, imgImages = reader.ReadImages()
+#print(cadImages)
+#plt.imshow(cadImages[10])
+#imageContent = numpy.array(cadImages[10])
+#print(imageContent)
+#nameList, originCoordinates, pointXCoordinates, pointYCoordinates, pointZCoordinates = reader.ReadMetadata()
+#reader.ConvertVectorListToArray(originCoordinates)

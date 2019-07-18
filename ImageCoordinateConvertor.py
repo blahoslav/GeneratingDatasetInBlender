@@ -8,17 +8,17 @@ Created on Thu Jul 11 15:20:30 2019
 
 import bpy
 import bpy_extras
-from mathutils import Matrix
+from mathutils import Matrix, Vector
 # Get the world coordinates of point_x, point_y and point_z
 
 def getWorldVectorCoordinateOfObjectOnScene(nameOfObject):
     obj = bpy.data.objects[nameOfObject]  
+    objectWorldVector = []
     objectWorldMatrix = obj.matrix_world 
-    objectWorldCoordinates = [];
+    objectWorldCoordinates = []
     for row in objectWorldMatrix:
       objectWorldCoordinates.append(row[3])
     objectWorldVector = Vector(objectWorldCoordinates)
-    print(objectWorldVector)
     return objectWorldVector
 
 #---------------------------------------------------------------
@@ -46,8 +46,7 @@ def getCalibrationMatrixKFromBlender(camd):
         pixel_aspect_ratio = scene.render.pixel_aspect_x / scene.render.pixel_aspect_y
         s_u = resolution_x_in_px * scale / sensor_width_in_mm
         s_v = resolution_y_in_px * scale * pixel_aspect_ratio / sensor_height_in_mm
-
-
+    
     # Parameters of intrinsic calibration matrix K
     alpha_u = f_in_mm * s_u
     alpha_v = f_in_mm * s_v
@@ -118,35 +117,35 @@ def get3x4PMatrixFromBlender(cam):
 # adapted from https://blender.stackexchange.com/questions/882/how-to-find-image-coordinates-of-the-rendered-vertex?lq=1
 # to have the y axes pointing up and origin at the top-left corner
 # ----------------------------------------------------------
-if __name__ == "__main__":
-    # Insert your camera name here
-    cam = bpy.data.objects['Camera']
-    P, K, RT = get3x4PMatrixFromBlender(cam)
-    print("Parameters")
-    print("K")
-    print(K)
-    print("RT")
-    print(RT)
-    print("P")
-    print(P)
-    print("*************************************************")
-    print("Point x (in the units of m)")
-    e1 = getWorldVectorCoordinateOfObjectOnScene('point_x')
-    p1 = P * e1
-    p1 /= p1[2]
-    print("Projected as (in the units of px)")
-    print(p1)
-    print("*************************************************")
-    print("Point y")
-    e2 = getWorldVectorCoordinateOfObjectOnScene('point_y')
-    p2 = P * e2
-    p2 /= p2[2]
-    print("Projected as")
-    print(p2)
-    print("*************************************************")
-    print("Point z")
-    e3 = getWorldVectorCoordinateOfObjectOnScene('point_z')
-    p3 = P * e3
-    p3 /= p3[2]
-    print("Projected as")
-    print(p3)
+#if __name__ == "__main__":
+#    # Insert your camera name here
+#    cam = bpy.data.objects['Camera']
+#    P, K, RT = get3x4PMatrixFromBlender(cam)
+#    print("Parameters")
+#    print("K")
+#    print(K)
+#    print("RT")
+#    print(RT)
+#    print("P")
+#    print(P)
+#    print("*************************************************")
+#    print("Point x (in the units of m)")
+#    e1 = getWorldVectorCoordinateOfObjectOnScene('point_x')
+#    p1 = P * e1
+#    p1 /= p1[2]
+#    print("Projected as (in the units of px)")
+#    print(p1)
+#    print("*************************************************")
+#    print("Point y")
+#    e2 = getWorldVectorCoordinateOfObjectOnScene('point_y')
+#    p2 = P * e2
+#    p2 /= p2[2]
+#    print("Projected as")
+#    print(p2)
+#    print("*************************************************")
+#    print("Point z")
+#    e3 = getWorldVectorCoordinateOfObjectOnScene('point_z')
+#    p3 = P * e3
+#    p3 /= p3[2]
+#    print("Projected as")
+#    print(p3)
