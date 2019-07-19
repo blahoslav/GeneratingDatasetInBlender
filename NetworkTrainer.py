@@ -45,56 +45,60 @@ class NetworkTrainer:
         Dense(4096, activation='relu'),
         Dense(8, activation='softmax')])
         return model
-    def prepareTrainingImagesAndData(self, cadFolder, imgFolder, metadataFolder):
+    def prepareTrainTestImagesAndData(self, cadFolder, imgFolder, metadataFolder, proportionOfTestImages):
         reader = DataReader.DataReader(cadFolder, imgFolder, metadataFolder)
         cadImageNames, cadImages, imgImageNames, imgImages = reader.ReadImages()
         nameList, originCoordinates, pointXCoordinates, pointYCoordinates, pointZCoordinates = reader.ReadMetadata()
         cadTrainImages = []
-        cadPointOCoordinates = []
-        cadPointXCoordinates = []
-        cadPointYCoordinates = []
-        cadPointZCoordinates = []
-        cadNames = []
+        cadTrainPointOCoordinates = []
+        cadTrainPointXCoordinates = []
+        cadTrainPointYCoordinates = []
+        cadTrainPointZCoordinates = []
+        cadTrainNames = []
         imgTrainImages = []
-        imgPointOCoordinates = []
-        imgPointXCoordinates = []
-        imgPointYCoordinates = []
-        imgPointZCoordinates = []
-        imgNames = []
+        imgTrainPointOCoordinates = []
+        imgTrainPointXCoordinates = []
+        imgTrainPointYCoordinates = []
+        imgTrainPointZCoordinates = []
+        imgTrainNames = []
         for x in range(0, len(cadImageNames)):
-            cadPicture = cadImages[x]
             for o in range(0, len(nameList)):
                 if(cadImageNames[x] == nameList[o]):
-                    cadPointOCoordinates.append(originCoordinates[o])
-                    cadPointXCoordinates.append(pointXCoordinates[o])
-                    cadPointYCoordinates.append(pointYCoordinates[o])
-                    cadPointZCoordinates.append(pointZCoordinates[o])
+                    cadTrainPointOCoordinates.append(originCoordinates[o])
+                    cadTrainPointXCoordinates.append(pointXCoordinates[o])
+                    cadTrainPointYCoordinates.append(pointYCoordinates[o])
+                    cadTrainPointZCoordinates.append(pointZCoordinates[o])
                     cadTrainImages.append(cadImages[x])
-                    cadNames.append(cadImageNames[x])
+                    cadTrainNames.append(cadImageNames[x])
             for k in range(0, len(imgImageNames)):
                 if(cadImageNames[x].replace("cube_cad_", "") == imgImageNames[k].replace("cube_img_", "")):
                     imgTrainImages.append(imgImages[k])
-                    imgNames.append(imgImageNames[k])
+                    imgTrainNames.append(imgImageNames[k])
                     for c in range(0, len(nameList)):
                         if (imgImageNames[k] == nameList[c]):
-                            imgPointOCoordinates.append(originCoordinates[c])
-                            imgPointXCoordinates.append(pointXCoordinates[c])
-                            imgPointYCoordinates.append(pointYCoordinates[c])
-                            imgPointZCoordinates.append(pointZCoordinates[c])
+                            imgTrainPointOCoordinates.append(originCoordinates[c])
+                            imgTrainPointXCoordinates.append(pointXCoordinates[c])
+                            imgTrainPointYCoordinates.append(pointYCoordinates[c])
+                            imgTrainPointZCoordinates.append(pointZCoordinates[c])
         trainImages = []
-        for p in range (0, len(cadNames)):
-            cadImage = np.array(cadImages[p])
-            imgImage = np.array(imgImages[p])
-            combinedImage = np.concatenate((cadImage, imgImage), axis=2)
-        
-        
-                            
+        print("Data")
+        print(np.shape(cadTrainImages))
+        print(np.shape(imgTrainImages))
+        print(len(cadTrainNames))
+        for p in range (0, len(cadTrainNames)):
+            cadImage = np.array(cadTrainImages[p])
+            imgImage = np.array(imgTrainImages[p])
+            trainImages.append(np.concatenate((cadImage, imgImage), axis=2))
+        return trainImages, cadTrainPointOCoordinates, cadTrainPointXCoordinates, cadTrainPointYCoordinates, cadTrainPointZCoordinates, cadTrainNames, imgTrainPointOCoordinates, imgTrainPointXCoordinates, imgTrainPointYCoordinates, imgTrainPointZCoordinates, imgTrainNames
+            
+            
 vggNetwork = NetworkTrainer((64, 64, 3))
-vggNetwork.prepareTrainingImagesAndData("/home/blahoslav/Documents/BlenderDatasetPreparation/cad", "/home/blahoslav/Documents/BlenderDatasetPreparation/img", "/home/blahoslav/Documents/BlenderDatasetPreparation")
+trainImages, cadPointOCoordinates, cadPointXCoordinates, cadPointYCoordinates, cadPointZCoordinates, cadNames, imgPointOCoordinates, imgPointXCoordinates, imgPointYCoordinates, imgPointZCoordinates, imgImageNames = vggNetwork.prepareTrainTestImagesAndData("/home/blahoslav/Documents/BlenderDatasetPreparation/cad", "/home/blahoslav/Documents/BlenderDatasetPreparation/img", "/home/blahoslav/Documents/BlenderDatasetPreparation", 0.75)
 #model = vggNetwork.prepareVGG16Model()
 #model.compile(loss=keras.losses.categorical_crossentropy, optimizer='adam', metrics=["accuracy"]) 
 
-        
+# fit(x=None, y=None, batch_size=None, epochs=1, verbose=1, callbacks=None, validation_split=0.0, validation_data=None, shuffle=True, class_weight=None, sample_weight=None, initial_epoch=0, steps_per_epoch=None, validation_steps=None, validation_freq=1)
+# model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=epochs, batch_size=64)   
 
 # Preparing dataset for training
 #picture1 = np.array(cadImages[5])
