@@ -30,10 +30,18 @@ class DataReader:
         self.__imgImages = []
         for imageName in glob.glob(self.cadFolderAddress + '/*.png'):
             self.__cadImageList.append(imageName.replace(self.cadFolderAddress + '/', ''))
-            self.__cadImages.append(Image.open(imageName))
+            img = Image.open(imageName)
+            width = 64
+            height = 64
+            img = img.resize((width, height), Image.ANTIALIAS) 
+            self.__cadImages.append(img)
         for imageName in glob.glob(self.imgFolderAddress + '/*.png'):
             self.__imgImageList.append(imageName.replace(self.imgFolderAddress + '/', ''))
-            self.__imgImages.append(Image.open(imageName))
+            img = Image.open(imageName)
+            width = 64
+            height = 64
+            img = img.resize((width, height), Image.ANTIALIAS) 
+            self.__imgImages.append(img)
         return self.__cadImageList, self.__cadImages, self.__imgImageList, self.__imgImages 
     
     def ReadMetadata(self):
