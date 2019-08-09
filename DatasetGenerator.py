@@ -29,7 +29,7 @@ def addBackgroundImage(filepath):
     bpy.data.worlds['World'].active_texture = texture
     bpy.context.scene.world.texture_slots[0].use_map_horizon = True
 
-number_of_images = 501
+number_of_images = 2000
 originOfCube = bpy.data.objects['cube_1']
 imageNames = []
 pointXCoordinates = []
@@ -42,6 +42,9 @@ P, K, RT = ImageCoordinateConvertor.get3x4PMatrixFromBlender(cam)
 for number_of_image in range(0, number_of_images):
     originOfCube.rotation_euler[2] = radians(number_of_image * (360.0 / number_of_images))
     bpy.data.scenes["Scene"].render.filepath = '/home/blahoslav/Documents/BlenderDatasetPreparation/cad/cube_cad_%d.png' % number_of_image
+    bpy.data.scenes["Scene"].render.resolution_x = 64
+    bpy.data.scenes["Scene"].render.resolution_y = 64
+    bpy.data.scenes["Scene"].render.resolution_percentage = 100
     bpy.ops.render.render(write_still=True)     
     imageNames.append("cube_cad_" + str(number_of_image) + ".png")
     e1 = ImageCoordinateConvertor.getWorldVectorCoordinateOfObjectOnScene('point_x')
@@ -66,6 +69,9 @@ addBackgroundImage('/home/blahoslav/Documents/BlenderDatasetPreparation/kensingt
 for number_of_image in range(0, number_of_images):
     originOfCube.rotation_euler[2] = radians((number_of_image * (360.0 / number_of_images)) + random.randint(-2,2))
     bpy.data.scenes["Scene"].render.filepath = '/home/blahoslav/Documents/BlenderDatasetPreparation/img/cube_img_%d.png' % number_of_image
+    bpy.data.scenes["Scene"].render.resolution_x = 64
+    bpy.data.scenes["Scene"].render.resolution_y = 64
+    bpy.data.scenes["Scene"].render.resolution_percentage = 100
     bpy.ops.render.render(write_still=True)     
     imageNames.append("cube_img_" + str(number_of_image) + ".png")
     e1 = ImageCoordinateConvertor.getWorldVectorCoordinateOfObjectOnScene('point_x')

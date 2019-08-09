@@ -31,6 +31,8 @@ def getCalibrationMatrixKFromBlender(camd):
     scene = bpy.context.scene
     resolution_x_in_px = scene.render.resolution_x
     resolution_y_in_px = scene.render.resolution_y
+#    resolution_x_in_px = bpy.data.scenes["Scene"].render.resolution_x
+#    resolution_y_in_px = bpy.data.scenes["Scene"].render.resolution_y 
     scale = scene.render.resolution_percentage / 100
     sensor_width_in_mm = camd.sensor_width
     sensor_height_in_mm = camd.sensor_height
