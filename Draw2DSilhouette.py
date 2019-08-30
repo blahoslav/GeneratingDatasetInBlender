@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import pdb
+import matplotlib.image as mpimg
 
 def project_pts(pts, K, R, t):
   """Projects 3D points.
@@ -29,23 +30,20 @@ with open("/home/blahoslav/Documents/Image308/duck/points.xyz", "r") as ins:
     UCoordinates = []
     VCoordinates = []
     WCoordinates = []
-    UVWCoordinates = []
     UVWCoordinate = []
     for line in ins:
-        UVWCoordinate.clear()
         pointCoordinates = line.split()
         UCoordinates.append(pointCoordinates[0])
         VCoordinates.append(pointCoordinates[1])
         WCoordinates.append(pointCoordinates[2])
-        UVWCoordinate.append(float(pointCoordinates[0]))
-        UVWCoordinate.append(float(pointCoordinates[1]))
-        UVWCoordinate.append(float(pointCoordinates[2]))
-        UVWCoordinates.append(UVWCoordinate)
+        UVWCoordinate.append(pointCoordinates[0])
+        UVWCoordinate.append(pointCoordinates[1])
+        UVWCoordinate.append(pointCoordinates[2])
+      #  UVWCoordinates.append(UVWCoordinate)
 
 UCoordinates = np.array(UCoordinates)
 VCoordinates = np.array(VCoordinates)
 WCoordinates = np.array(WCoordinates)
-UVWCoordinates = np.array(UVWCoordinates)
 # 000308-color.png -> duck
 R = np.array( [[0.851779997349, 0.202316999435, -0.483258992434, 0.0076962755993],
              [-0.313771009445, -0.541687011719, -0.779823005199, 0.00826022215188],
@@ -54,9 +52,18 @@ R = np.array( [[0.851779997349, 0.202316999435, -0.483258992434, 0.0076962755993
     
 R_simple = np.array( [[0.851779997349, 0.202316999435, -0.483258992434],
              [-0.313771009445, -0.541687011719, -0.779823005199],
-             [-0.41954600811, 0.815869987011, -0.397915989161]] ) 
-T = np.array([0.0076962755993, 0.00826022215188, 0.743500173092]) 
+             [-0.41954600811, 0.815869987011, -0.397915989161]] )
     
+#    R_simple = np.array( [[0.851779997349, 0.202316999435, -0.483258992434],
+#             [0.313771009445, 0.541687011719, 0.779823005199],
+#             [0.41954600811, -0.815869987011, 0.397915989161]] )
+#R_simple_2 = np.array( [[-0.41954600811, 0.815869987011, -0.397915989161],
+#             [-0.313771009445, -0.541687011719, -0.779823005199],
+#             [0.851779997349, 0.202316999435, -0.483258992434]] )
+        
+T = np.array([[0.0076962755993], 
+              [0.00826022215188], 
+              [0.743500173092]]) 
 K = np.array( [[572.4114, 0.0, 325.2611, 0.0],
              [0.0, 573.57043, 242.04899, 0.0],
              [ 0.0, 0.0, 1.0, 0.0]] )
@@ -64,24 +71,25 @@ KSimple = np.array( [[572.4114, 0.0, 325.2611],
              [0.0, 573.57043, 242.04899],
              [ 0.0, 0.0, 1.0]] )
     
-vysledek = project_pts(UVWCoordinates, KSimple, R_simple, T)
 uCoordinates = []
 vCoordinates = []
+UVWCoordinates = []
 for i in range(0, len(UCoordinates)):
     worldCoordinates = np.array( [[UCoordinates[i].astype(float)],
                                    [VCoordinates[i].astype(float)],
                                    [WCoordinates[i].astype(float)],
                                    [1]])
+    UVWCoordinates.append(np.array([UCoordinates[i].astype(float), VCoordinates[i].astype(float), WCoordinates[i].astype(float)]))
     cameraCoordinates = R @ worldCoordinates
     filmCoordinates = K @ cameraCoordinates
     uCoordinates.append((filmCoordinates[0][0])/filmCoordinates[2][0])
     vCoordinates.append((filmCoordinates[1][0])/filmCoordinates[2][0]) 
-
+UVWCoordinates = np.array(UVWCoordinates)
+vysledek = project_pts(UVWCoordinates, KSimple, R_simple, T)
+# plt.plot(uCoordinates, vCoordinates, 'ro')
+uCoordinates, vCoordinates = zip(*vysledek)
 plt.plot(uCoordinates, vCoordinates, 'ro')
-# plt.axis([-50, 1064, -50, 60])
-
-
-
+plt.axis([0, 640, 480, 0])
+img=mpimg.imread('/home/blahoslav/Documents/Image308/duck/09 - duck/000308-color.png')
+imgplot = plt.imshow(img)
 plt.show()
-
-
